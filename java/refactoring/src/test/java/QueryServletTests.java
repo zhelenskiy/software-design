@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Test;
 import ru.akirakozov.sd.refactoring.servlet.QueryServlet;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
@@ -9,11 +10,11 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class QueryServletTests extends AbstractServletTests<QueryServlet> {
     public QueryServletTests() {
-        super(QueryServlet::new, QueryServlet::doGet);
+        super(QueryServlet::new);
     }
 
     @Test
-    public void testManyElements() throws IOException, SQLException {
+    public void testManyElements() throws IOException, SQLException, ServletException {
         runQuery(
                 inserter("toy1", 200),
                 inserter("toy2", 300),

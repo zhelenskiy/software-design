@@ -1,8 +1,7 @@
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import ru.akirakozov.sd.refactoring.servlet.GetProductsServlet;
 
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
@@ -11,22 +10,22 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class GetProductsServletTests extends AbstractServletTests<GetProductsServlet> {
     public GetProductsServletTests() {
-        super(GetProductsServlet::new, GetProductsServlet::doGet);
+        super(GetProductsServlet::new);
     }
 
     @Test
-    public void testEmpty() throws IOException {
+    public void testEmpty() throws IOException, ServletException {
         testServletTrimmed(Map.of(), s -> assertThat(s).isEqualTo("<html><body>\n</body></html>"));
     }
 
     @Test
-    public void testOneElement() throws IOException, SQLException {
+    public void testOneElement() throws IOException, SQLException, ServletException {
         runQuery(inserter("transformer", 200));
         testServletTrimmed(Map.of(), s -> assertThat(s).isEqualTo("<html><body>\ntransformer\t200</br>\n</body></html>"));
     }
 
     @Test
-    public void testManyElements() throws IOException, SQLException {
+    public void testManyElements() throws IOException, SQLException, ServletException {
         runQuery(
                 inserter("toy1", 200),
                 inserter("toy2", 300),

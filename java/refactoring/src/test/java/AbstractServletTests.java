@@ -4,7 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import ru.akirakozov.sd.refactoring.Main;
+import ru.akirakozov.sd.refactoring.servlet.AbstractGetServlet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,13 +24,11 @@ import java.util.function.Supplier;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AbstractServletTests<T extends HttpServlet> {
+public class AbstractServletTests<T extends AbstractGetServlet> {
     private final Supplier<T> supplier;
-    private final RequestMaker<T> requester;
 
-    public AbstractServletTests(Supplier<T> supplier, RequestMaker<T> requester) {
+    public AbstractServletTests(Supplier<T> supplier) {
         this.supplier = supplier;
-        this.requester = requester;
     }
 
     @BeforeAll
@@ -50,17 +50,17 @@ public class AbstractServletTests<T extends HttpServlet> {
         void make(T servlet, HttpServletRequest request, HttpServletResponse response) throws IOException;
     }
 
-    protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException {
+    protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         requestParameters.forEach((key, value) -> when(request.getParameter(key)).thenReturn(value));
         HttpServletResponse response = mock(HttpServletResponse.class);
         StringWriter stringWriter = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(stringWriter, true));
-        requester.make(supplier.get(), request, response);
+        supplier.get().doGet(request, response);
         responseChecker.accept(stringWriter.toString());
     }
 
-    protected void testServletTrimmed(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException {
+    protected void testServletTrimmed(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
         testServlet(requestParameters, s -> responseChecker.accept(s.trim()));
     }
 
