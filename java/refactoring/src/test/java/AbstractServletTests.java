@@ -35,6 +35,7 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
         try {
             Main.main(new String[0]);
         } catch (Exception ignored) {
+            // is already started
         }
     }
 
@@ -59,8 +60,7 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
     }
 
     protected void runQueries(String @NotNull ... queries) throws SQLException {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-            Statement statement = c.createStatement();
+        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db"); Statement statement = c.createStatement()) {
             for (String query: queries) {
                 statement.executeUpdate(query);
             }

@@ -22,13 +22,13 @@ public abstract class AbstractProductServlet extends HttpServlet {
 
     public static void runQuery(String query, ThrowableConsumer<ResultSet> resSetConsumer) {
         runSql(stmt -> {
-            ResultSet rs = stmt.executeQuery(query);
-            // limits are already specified in query
-            // So we don't need to check it twice, and we can just take all received elements
-            while (rs.next()) {
-                resSetConsumer.accept(rs);
+            try (ResultSet rs = stmt.executeQuery(query)) {
+                // limits are already specified in query
+                // So we don't need to check it twice, and we can just take all received elements
+                while (rs.next()) {
+                    resSetConsumer.accept(rs);
+                }
             }
-            rs.close();
         });
     }
 
@@ -38,10 +38,8 @@ public abstract class AbstractProductServlet extends HttpServlet {
 
     public static void runSql(ThrowableConsumer<Statement> statementUser) {
         try {
-            try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
-                Statement stmt = c.createStatement();
+            try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db"); Statement stmt = c.createStatement()) {
                 statementUser.accept(stmt);
-                stmt.close();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
