@@ -3,10 +3,11 @@ import ru.akirakozov.sd.refactoring.servlet.QueryServlet;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
+import static ru.akirakozov.sd.refactoring.DbAccessor.insert;
+import static ru.akirakozov.sd.refactoring.DbAccessor.runSql;
 
 public class QueryServletTests extends AbstractServletTests<QueryServlet> {
     public QueryServletTests() {
@@ -14,12 +15,10 @@ public class QueryServletTests extends AbstractServletTests<QueryServlet> {
     }
 
     @Test
-    public void testManyElements() throws IOException, SQLException, ServletException {
-        runQueries(
-                inserter("toy1", 200),
-                inserter("toy2", 300),
-                inserter("toy3", 400)
-        );
+    public void testManyElements() throws IOException, ServletException {
+        runSql(stmt -> stmt.executeUpdate(insert("toy1", 200)));
+        runSql(stmt -> stmt.executeUpdate(insert("toy2", 300)));
+        runSql(stmt -> stmt.executeUpdate(insert("toy3", 400)));
         for (Map.Entry<String, String> pair : Map.of(
                 "max", "<html><body>\n<h1>Product with max price: </h1>\ntoy3\t400</br>\n</body></html>",
                 "min", "<html><body>\n<h1>Product with min price: </h1>\ntoy1\t200</br>\n</body></html>",

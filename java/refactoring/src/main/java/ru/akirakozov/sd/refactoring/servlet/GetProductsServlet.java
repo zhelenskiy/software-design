@@ -1,12 +1,13 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
-import ru.akirakozov.sd.refactoring.HtmlRender;
+import ru.akirakozov.sd.refactoring.DbAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import static ru.akirakozov.sd.refactoring.DbAccessor.allProductsQuery;
 import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 
 /**
@@ -16,7 +17,7 @@ public class GetProductsServlet extends AbstractProductServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, rs -> writeProduct(rs, response.getWriter()));
+        DbAccessor.runQueryToHtml(allProductsQuery, response, null, NORMAL, rs -> DbAccessor.writeProduct(rs, response.getWriter()));
         setHeaderSuccess(response);
     }
 }

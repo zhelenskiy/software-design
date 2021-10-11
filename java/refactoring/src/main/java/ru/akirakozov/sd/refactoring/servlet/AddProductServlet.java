@@ -1,6 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
+import ru.akirakozov.sd.refactoring.DbAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +16,8 @@ public class AddProductServlet extends AbstractProductServlet {
     public void doGet(@NotNull HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
         long price = Long.parseLong(request.getParameter("price"));
-        runSql(stmt -> stmt.executeUpdate(
-                "INSERT INTO PRODUCT " + "(NAME, PRICE) VALUES (\"" + name + "\"," + price + ")")
+        DbAccessor.runSql(stmt -> stmt.executeUpdate(
+                "INSERT INTO PRODUCT (NAME, PRICE) VALUES (\"" + name + "\"," + price + ")")
         );
         setHeaderSuccess(response);
         response.getWriter().println("OK");

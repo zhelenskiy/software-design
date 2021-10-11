@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static ru.akirakozov.sd.refactoring.DbAccessor.*;
 
 public class AbstractServletTests<T extends AbstractProductServlet> {
     private final Supplier<T> supplier;
@@ -41,8 +42,8 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
 
     @BeforeEach
     @AfterEach
-    void clearDataBase() throws SQLException {
-        runQueries("DELETE FROM PRODUCT ");
+    void clearDataBase() {
+        runSql(stmt -> stmt.executeUpdate(clearDatabaseQuery));
     }
 
     protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
@@ -57,18 +58,5 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
 
     protected void testServletTrimmed(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
         testServlet(requestParameters, s -> responseChecker.accept(s.trim()));
-    }
-
-    protected void runQueries(String @NotNull ... queries) throws SQLException {
-        try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db"); Statement statement = c.createStatement()) {
-            for (String query: queries) {
-                statement.executeUpdate(query);
-            }
-        }
-    }
-
-    @Contract(pure = true)
-    protected @NotNull String inserter(String name, int price) {
-        return "INSERT INTO PRODUCT (NAME, PRICE) VALUES (\"" + name + "\", " + price + ")";
     }
 }
