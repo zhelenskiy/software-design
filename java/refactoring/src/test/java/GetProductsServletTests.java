@@ -20,13 +20,13 @@ public class GetProductsServletTests extends AbstractServletTests<GetProductsSer
 
     @Test
     public void testOneElement() throws IOException, SQLException, ServletException {
-        runQuery(inserter("transformer", 200));
+        runQueries(inserter("transformer", 200));
         testServletTrimmed(Map.of(), s -> assertThat(s).isEqualTo("<html><body>\ntransformer\t200</br>\n</body></html>"));
     }
 
     @Test
     public void testManyElements() throws IOException, SQLException, ServletException {
-        runQuery(
+        runQueries(
                 inserter("toy1", 200),
                 inserter("toy2", 300),
                 inserter("toy3", 400)

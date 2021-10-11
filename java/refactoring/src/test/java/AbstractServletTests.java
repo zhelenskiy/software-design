@@ -4,10 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import ru.akirakozov.sd.refactoring.Main;
-import ru.akirakozov.sd.refactoring.servlet.AbstractGetServlet;
+import ru.akirakozov.sd.refactoring.servlet.AbstractProductServlet;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -24,7 +23,7 @@ import java.util.function.Supplier;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AbstractServletTests<T extends AbstractGetServlet> {
+public class AbstractServletTests<T extends AbstractProductServlet> {
     private final Supplier<T> supplier;
 
     public AbstractServletTests(Supplier<T> supplier) {
@@ -42,12 +41,7 @@ public class AbstractServletTests<T extends AbstractGetServlet> {
     @BeforeEach
     @AfterEach
     void clearDataBase() throws SQLException {
-        runQuery("DELETE FROM PRODUCT ");
-    }
-
-    @FunctionalInterface
-    protected interface RequestMaker<T extends HttpServlet> {
-        void make(T servlet, HttpServletRequest request, HttpServletResponse response) throws IOException;
+        runQueries("DELETE FROM PRODUCT ");
     }
 
     protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
@@ -64,7 +58,7 @@ public class AbstractServletTests<T extends AbstractGetServlet> {
         testServlet(requestParameters, s -> responseChecker.accept(s.trim()));
     }
 
-    protected void runQuery(String @NotNull ... queries) throws SQLException {
+    protected void runQueries(String @NotNull ... queries) throws SQLException {
         try (Connection c = DriverManager.getConnection("jdbc:sqlite:test.db")) {
             Statement statement = c.createStatement();
             for (String query: queries) {

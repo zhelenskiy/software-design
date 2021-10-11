@@ -15,7 +15,7 @@ public class QueryServletTests extends AbstractServletTests<QueryServlet> {
 
     @Test
     public void testManyElements() throws IOException, SQLException, ServletException {
-        runQuery(
+        runQueries(
                 inserter("toy1", 200),
                 inserter("toy2", 300),
                 inserter("toy3", 400)
