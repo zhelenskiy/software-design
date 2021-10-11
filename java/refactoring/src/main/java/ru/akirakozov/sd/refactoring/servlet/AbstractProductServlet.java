@@ -8,10 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 public abstract class AbstractProductServlet extends HttpServlet {
     @Override
@@ -21,16 +18,28 @@ public abstract class AbstractProductServlet extends HttpServlet {
     public interface ThrowableBiConsumer<T, U> {
         void accept(T item1, U item2) throws Exception;
     }
+
     @FunctionalInterface
     public interface ThrowableConsumer<T> {
         void accept(T item1) throws Exception;
     }
 
-    public static void runQuery(String query, HttpServletResponse response, ThrowableBiConsumer<ResultSet, PrintWriter> writer) {
+    public static void runQuery(String query, HttpServletResponse response, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
         runSql(stmt -> {
             ResultSet rs = stmt.executeQuery(query);
-            writer.accept(rs, response.getWriter());
+            resAndWriter.accept(rs, response.getWriter());
             rs.close();
+        });
+    }
+
+    public static void runQueryToHtml(String query, HttpServletResponse response, String header, boolean headerH1, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
+        runQuery(query, response, (set, writer) -> {
+            writer.println("<html><body>");
+            if (header != null) {
+                writer.println(headerH1 ? "<h1>" + header + "</h1>" : header);
+            }
+            resAndWriter.accept(set, writer);
+            writer.println("</body></html>");
         });
     }
 
@@ -49,5 +58,11 @@ public abstract class AbstractProductServlet extends HttpServlet {
     public static void setHeaderSuccess(@NotNull HttpServletResponse response) {
         response.setContentType("text/html");
         response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    public static void writeProduct(@NotNull ResultSet rs, @NotNull PrintWriter writer) throws SQLException {
+        String name = rs.getString("name");
+        int price = rs.getInt("price");
+        writer.println(name + "\t" + price + "</br>");
     }
 }
