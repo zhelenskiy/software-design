@@ -2,8 +2,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import ru.akirakozov.sd.refactoring.DbAccessor;
 import ru.akirakozov.sd.refactoring.Main;
+import ru.akirakozov.sd.refactoring.model.AbstractProductAccessor;
+import ru.akirakozov.sd.refactoring.model.DbProductAccessor;
 import ru.akirakozov.sd.refactoring.servlet.AbstractProductServlet;
 
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.mockito.Mockito.mock;
@@ -21,9 +23,10 @@ import static org.mockito.Mockito.when;
 
 public class AbstractServletTests<T extends AbstractProductServlet> {
     private final Supplier<T> supplier;
+    protected AbstractProductAccessor accessor = new DbProductAccessor();
 
-    public AbstractServletTests(Supplier<T> supplier) {
-        this.supplier = supplier;
+    public AbstractServletTests(Function<AbstractProductAccessor, T> supplier) {
+        this.supplier = () -> supplier.apply(accessor);
     }
 
     @BeforeAll
@@ -38,7 +41,7 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
     @BeforeEach
     @AfterEach
     void clearDataBase() {
-        DbAccessor.clearDatabase();
+        accessor.clearDatabase();
     }
 
     protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {

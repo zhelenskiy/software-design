@@ -1,7 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
-import ru.akirakozov.sd.refactoring.DbAccessor;
+import ru.akirakozov.sd.refactoring.model.AbstractProductAccessor;
 import ru.akirakozov.sd.refactoring.HtmlRender;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +16,10 @@ import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
  * @author akirakozov
  */
 public class QueryServlet extends AbstractProductServlet {
+    public QueryServlet(AbstractProductAccessor accessor) {
+        super(accessor);
+    }
+
     @Override
     public void doGet(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
@@ -37,18 +41,18 @@ public class QueryServlet extends AbstractProductServlet {
     }
 
     private void countTo(@NotNull PrintWriter writer) {
-        HtmlRender.html(writer, "Number of products: ", NORMAL, Long.toString(DbAccessor.count()));
+        HtmlRender.html(writer, "Number of products: ", NORMAL, Long.toString(accessor.count()));
     }
 
     private void sumTo(@NotNull PrintWriter writer) {
-        HtmlRender.html(writer, "Summary price: ", NORMAL, Long.toString(DbAccessor.sum()));
+        HtmlRender.html(writer, "Summary price: ", NORMAL, Long.toString(accessor.sum()));
     }
 
     private void minTo(@NotNull PrintWriter writer) {
-        HtmlRender.html(writer, "Product with min price: ", H1, DbAccessor.min().toString());
+        HtmlRender.html(writer, "Product with min price: ", H1, accessor.min().toString());
     }
 
     private void maxTo(@NotNull PrintWriter writer) {
-        HtmlRender.html(writer, "Product with max price: ", H1, DbAccessor.max().toString());
+        HtmlRender.html(writer, "Product with max price: ", H1, accessor.max().toString());
     }
 }

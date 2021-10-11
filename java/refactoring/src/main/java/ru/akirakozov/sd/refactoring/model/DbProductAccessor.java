@@ -1,4 +1,4 @@
-package ru.akirakozov.sd.refactoring;
+package ru.akirakozov.sd.refactoring.model;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -7,63 +7,72 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DbAccessor {
+public class DbProductAccessor implements AbstractProductAccessor {
     @FunctionalInterface
     private interface ThrowableFunction<T, R> {
         R accept(T item1) throws Exception;
     }
 
-    public static long count() {
+
+    @Override
+    public long count() {
         List<Long> list = runQuery(countProductsQuery, res -> res.getLong(1));
         assert list.size() == 1;
         return list.get(0);
     }
 
-    public static long sum() {
+    @Override
+    public long sum() {
         List<Long> list = runQuery(sumPriceProductsQuery, res -> res.getLong(1));
         assert list.size() == 1;
         return list.get(0);
     }
 
-    public static Product min() {
-        List<Product> list = runQuery(minPriceProductsQuery, DbAccessor::getProduct);
+    @Override
+    public ProductPOJO min() {
+        List<ProductPOJO> list = runQuery(minPriceProductsQuery, DbProductAccessor::getProduct);
         assert list.size() <= 1;
         return list.get(0);
     }
 
-    public static Product max() {
-        List<Product> list = runQuery(maxPriceProductsQuery, DbAccessor::getProduct);
+    @Override
+    public ProductPOJO max() {
+        List<ProductPOJO> list = runQuery(maxPriceProductsQuery, DbProductAccessor::getProduct);
         assert list.size() <= 1;
         return list.get(0);
     }
 
-    public static List<Product> all() {
-        return runQuery(allProductsQuery, DbAccessor::getProduct);
+    @Override
+    public List<ProductPOJO> all() {
+        return runQuery(allProductsQuery, DbProductAccessor::getProduct);
     }
 
     private static void runUpdate(@NotNull String query) {
         runSql(st -> st.executeUpdate(query));
     }
 
-    public static void createTableIfNotExists() {
+    @Override
+    public void createTableIfNotExists() {
         runUpdate(createTableQuery);
     }
 
-    public static void clearDatabase() {
+    @Override
+    public void clearDatabase() {
         runUpdate(clearDatabaseQuery);
     }
 
-    public static void insertProduct(@NotNull Product product) {
+    @Override
+    public void insertProduct(@NotNull ProductPOJO product) {
         runUpdate(insert(product.name, product.price));
     }
 
-    public static final String countProductsQuery = "SELECT COUNT(*) FROM PRODUCT";
-    public static final String sumPriceProductsQuery = "SELECT SUM(price) FROM PRODUCT";
-    public static final String minPriceProductsQuery = "SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1";
-    public static final String maxPriceProductsQuery = "SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1";
-    public static final String allProductsQuery = "SELECT * FROM PRODUCT";
-    public static final String clearDatabaseQuery = "DELETE FROM PRODUCT ";
-    public static final String createTableQuery =
+    private static final String countProductsQuery = "SELECT COUNT(*) FROM PRODUCT";
+    private static final String sumPriceProductsQuery = "SELECT SUM(price) FROM PRODUCT";
+    private static final String minPriceProductsQuery = "SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1";
+    private static final String maxPriceProductsQuery = "SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1";
+    private static final String allProductsQuery = "SELECT * FROM PRODUCT";
+    private static final String clearDatabaseQuery = "DELETE FROM PRODUCT ";
+    private static final String createTableQuery =
             "CREATE TABLE IF NOT EXISTS PRODUCT" +
                     "(ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                     " NAME           TEXT    NOT NULL, " +
@@ -96,9 +105,9 @@ public class DbAccessor {
         }
     }
 
-    private static @NotNull Product getProduct(@NotNull ResultSet rs) throws SQLException {
+    private static @NotNull ProductPOJO getProduct(@NotNull ResultSet rs) throws SQLException {
         String name = rs.getString("name");
         int price = rs.getInt("price");
-        return new Product(name, price);
+        return new ProductPOJO(name, price);
     }
 }

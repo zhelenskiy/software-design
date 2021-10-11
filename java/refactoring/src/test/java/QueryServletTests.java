@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ru.akirakozov.sd.refactoring.DbAccessor;
-import ru.akirakozov.sd.refactoring.Product;
+import ru.akirakozov.sd.refactoring.model.ProductPOJO;
 import ru.akirakozov.sd.refactoring.servlet.QueryServlet;
 
 import javax.servlet.ServletException;
@@ -16,9 +15,9 @@ public class QueryServletTests extends AbstractServletTests<QueryServlet> {
 
     @Test
     public void testManyElements() throws IOException, ServletException {
-        DbAccessor.insertProduct(new Product("toy1", 200));
-        DbAccessor.insertProduct(new Product("toy2", 300));
-        DbAccessor.insertProduct(new Product("toy3", 400));
+        accessor.insertProduct(new ProductPOJO("toy1", 200));
+        accessor.insertProduct(new ProductPOJO("toy2", 300));
+        accessor.insertProduct(new ProductPOJO("toy3", 400));
         for (Map.Entry<String, String> pair : Map.of(
                 "max", "<html><body>\n<h1>Product with max price: </h1>\ntoy3\t400</br>\n</body></html>",
                 "min", "<html><body>\n<h1>Product with min price: </h1>\ntoy1\t200</br>\n</body></html>",
