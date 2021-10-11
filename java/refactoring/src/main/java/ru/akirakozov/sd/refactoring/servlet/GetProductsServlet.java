@@ -5,6 +5,8 @@ import ru.akirakozov.sd.refactoring.HtmlRender;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+
 import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 
 /**
@@ -13,12 +15,8 @@ import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 public class GetProductsServlet extends AbstractProductServlet {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, rs -> {
-            while (rs.next()) {
-                writeProduct(rs, response.getWriter());
-            }
-        });
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, rs -> writeProduct(rs, response.getWriter()));
         setHeaderSuccess(response);
     }
 }

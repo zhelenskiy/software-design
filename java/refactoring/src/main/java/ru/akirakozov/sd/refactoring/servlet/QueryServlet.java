@@ -1,7 +1,6 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
-import ru.akirakozov.sd.refactoring.HtmlRender;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,39 +32,23 @@ public class QueryServlet extends AbstractProductServlet {
         setHeaderSuccess(response);
     }
 
-    private void countTo(HttpServletResponse response) {
+    private void countTo(HttpServletResponse response) throws IOException {
         runQueryToHtml("SELECT COUNT(*) FROM PRODUCT", response,
-                "Number of products: ", NORMAL, rs -> {
-            if (rs.next()) {
-                response.getWriter().println(rs.getInt(1));
-            }
-        });
+                "Number of products: ", NORMAL, rs -> response.getWriter().println(rs.getInt(1)));
     }
 
-    private void sumTo(HttpServletResponse response) {
+    private void sumTo(HttpServletResponse response) throws IOException {
         runQueryToHtml("SELECT SUM(price) FROM PRODUCT", response,
-                "Summary price: ", NORMAL, (rs) -> {
-                    if (rs.next()) {
-                        response.getWriter().println(rs.getInt(1));
-                    }
-                });
+                "Summary price: ", NORMAL, rs -> response.getWriter().println(rs.getInt(1)));
     }
 
-    private void minTo(HttpServletResponse response) {
+    private void minTo(HttpServletResponse response) throws IOException {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1", response,
-                "Product with min price: ", H1, rs -> {
-                    if (rs.next()) {
-                        writeProduct(rs, response.getWriter());
-                    }
-                });
+                "Product with min price: ", H1, rs -> writeProduct(rs, response.getWriter()));
     }
 
-    private void maxTo(HttpServletResponse response) {
+    private void maxTo(HttpServletResponse response) throws IOException {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1", response,
-                "Product with max price: ", H1, rs -> {
-                    if (rs.next()) {
-                        writeProduct(rs, response.getWriter());
-                    }
-                });
+                "Product with max price: ", H1, rs -> writeProduct(rs, response.getWriter()));
     }
 }

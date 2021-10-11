@@ -20,18 +20,20 @@ public abstract class AbstractProductServlet extends HttpServlet {
         void accept(T item1) throws Exception;
     }
 
-    public static void runQuery(String query, HttpServletResponse response, ThrowableConsumer<ResultSet> resSetConsumer) {
+    public static void runQuery(String query, ThrowableConsumer<ResultSet> resSetConsumer) {
         runSql(stmt -> {
             ResultSet rs = stmt.executeQuery(query);
-            resSetConsumer.accept(rs);
+            // limits are already specified in query
+            // So we don't need to check it twice, and we can just take all received elements
+            while (rs.next()) {
+                resSetConsumer.accept(rs);
+            }
             rs.close();
         });
     }
 
-    public static void runQueryToHtml(String query, HttpServletResponse response, String header, HtmlRender.HeaderState headerState, ThrowableConsumer<ResultSet> res) {
-        runQuery(query, response,
-                set -> HtmlRender.html(response.getWriter(), header, headerState, () -> res.accept(set))
-        );
+    public static void runQueryToHtml(String query, @NotNull HttpServletResponse response, String header, HtmlRender.HeaderState headerState, ThrowableConsumer<ResultSet> res) throws IOException {
+        HtmlRender.html(response.getWriter(), header, headerState, () -> runQuery(query, res));
     }
 
     public static void runSql(ThrowableConsumer<Statement> statementUser) {
