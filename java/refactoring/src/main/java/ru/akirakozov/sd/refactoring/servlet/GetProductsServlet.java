@@ -14,9 +14,9 @@ public class GetProductsServlet extends AbstractProductServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, (rs, writer) -> {
+        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, rs -> {
             while (rs.next()) {
-                writeProduct(rs, writer);
+                writeProduct(rs, response.getWriter());
             }
         });
         setHeaderSuccess(response);

@@ -35,36 +35,36 @@ public class QueryServlet extends AbstractProductServlet {
 
     private void countTo(HttpServletResponse response) {
         runQueryToHtml("SELECT COUNT(*) FROM PRODUCT", response,
-                "Number of products: ", NORMAL, (rs, writer) -> {
+                "Number of products: ", NORMAL, rs -> {
             if (rs.next()) {
-                writer.println(rs.getInt(1));
+                response.getWriter().println(rs.getInt(1));
             }
         });
     }
 
     private void sumTo(HttpServletResponse response) {
         runQueryToHtml("SELECT SUM(price) FROM PRODUCT", response,
-                "Summary price: ", NORMAL, (rs, writer) -> {
+                "Summary price: ", NORMAL, (rs) -> {
                     if (rs.next()) {
-                        writer.println(rs.getInt(1));
+                        response.getWriter().println(rs.getInt(1));
                     }
                 });
     }
 
     private void minTo(HttpServletResponse response) {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1", response,
-                "Product with min price: ", H1, (rs, writer) -> {
+                "Product with min price: ", H1, rs -> {
                     if (rs.next()) {
-                        writeProduct(rs, writer);
+                        writeProduct(rs, response.getWriter());
                     }
                 });
     }
 
     private void maxTo(HttpServletResponse response) {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1", response,
-                "Product with max price: ", H1, (rs, writer) -> {
+                "Product with max price: ", H1, rs -> {
                     if (rs.next()) {
-                        writeProduct(rs, writer);
+                        writeProduct(rs, response.getWriter());
                     }
                 });
     }

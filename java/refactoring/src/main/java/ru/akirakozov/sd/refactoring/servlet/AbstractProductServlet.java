@@ -16,26 +16,21 @@ public abstract class AbstractProductServlet extends HttpServlet {
     public abstract void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
     @FunctionalInterface
-    public interface ThrowableBiConsumer<T, U> {
-        void accept(T item1, U item2) throws Exception;
-    }
-
-    @FunctionalInterface
     public interface ThrowableConsumer<T> {
         void accept(T item1) throws Exception;
     }
 
-    public static void runQuery(String query, HttpServletResponse response, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
+    public static void runQuery(String query, HttpServletResponse response, ThrowableConsumer<ResultSet> resSetConsumer) {
         runSql(stmt -> {
             ResultSet rs = stmt.executeQuery(query);
-            resAndWriter.accept(rs, response.getWriter());
+            resSetConsumer.accept(rs);
             rs.close();
         });
     }
 
-    public static void runQueryToHtml(String query, HttpServletResponse response, String header, HtmlRender.HeaderState headerState, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
+    public static void runQueryToHtml(String query, HttpServletResponse response, String header, HtmlRender.HeaderState headerState, ThrowableConsumer<ResultSet> res) {
         runQuery(query, response,
-                (set, writer) -> HtmlRender.html(writer, header, headerState, () -> resAndWriter.accept(set, writer))
+                set -> HtmlRender.html(response.getWriter(), header, headerState, () -> res.accept(set))
         );
     }
 
