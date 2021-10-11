@@ -2,12 +2,13 @@ package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
 import ru.akirakozov.sd.refactoring.DbAccessor;
+import ru.akirakozov.sd.refactoring.HtmlRender;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-import static ru.akirakozov.sd.refactoring.DbAccessor.*;
 import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.H1;
 import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 
@@ -16,41 +17,38 @@ import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
  */
 public class QueryServlet extends AbstractProductServlet {
     @Override
-    public void doGet(@NotNull HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws IOException {
         String command = request.getParameter("command");
 
+        final PrintWriter writer = response.getWriter();
         if ("max".equals(command)) {
-            maxTo(response);
+            maxTo(writer);
         } else if ("min".equals(command)) {
-            minTo(response);
+            minTo(writer);
         } else if ("sum".equals(command)) {
-            sumTo(response);
+            sumTo(writer);
         } else if ("count".equals(command)) {
-            countTo(response);
+            countTo(writer);
         } else {
-            response.getWriter().println("Unknown command: " + command);
+            writer.println("Unknown command: " + command);
         }
 
         setHeaderSuccess(response);
     }
 
-    private void countTo(HttpServletResponse response) throws IOException {
-        DbAccessor.runQueryToHtml(countProductsQuery, response,
-                "Number of products: ", NORMAL, rs -> response.getWriter().println(rs.getInt(1)));
+    private void countTo(@NotNull PrintWriter writer) {
+        HtmlRender.html(writer, "Number of products: ", NORMAL, Long.toString(DbAccessor.count()));
     }
 
-    private void sumTo(HttpServletResponse response) throws IOException {
-        DbAccessor.runQueryToHtml(sumPriceProductsQuery, response,
-                "Summary price: ", NORMAL, rs -> response.getWriter().println(rs.getInt(1)));
+    private void sumTo(@NotNull PrintWriter writer) {
+        HtmlRender.html(writer, "Summary price: ", NORMAL, Long.toString(DbAccessor.sum()));
     }
 
-    private void minTo(HttpServletResponse response) throws IOException {
-        DbAccessor.runQueryToHtml(minPriceProductsQuery, response,
-                "Product with min price: ", H1, rs -> DbAccessor.writeProduct(rs, response.getWriter()));
+    private void minTo(@NotNull PrintWriter writer) {
+        HtmlRender.html(writer, "Product with min price: ", H1, DbAccessor.min().toString());
     }
 
-    private void maxTo(HttpServletResponse response) throws IOException {
-        DbAccessor.runQueryToHtml(maxPriceProductsQuery, response,
-                "Product with max price: ", H1, rs -> DbAccessor.writeProduct(rs, response.getWriter()));
+    private void maxTo(@NotNull PrintWriter writer) {
+        HtmlRender.html(writer, "Product with max price: ", H1, DbAccessor.max().toString());
     }
 }

@@ -7,14 +7,12 @@ import ru.akirakozov.sd.refactoring.servlet.AddProductServlet;
 import ru.akirakozov.sd.refactoring.servlet.GetProductsServlet;
 import ru.akirakozov.sd.refactoring.servlet.QueryServlet;
 
-import static ru.akirakozov.sd.refactoring.DbAccessor.createTableQuery;
-
 /**
  * @author akirakozov
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        DbAccessor.runSql(stmt -> stmt.executeUpdate(createTableQuery));
+        DbAccessor.createTableIfNotExists();
 
         Server server = new Server(8081);
 

@@ -2,6 +2,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import ru.akirakozov.sd.refactoring.DbAccessor;
 import ru.akirakozov.sd.refactoring.Main;
 import ru.akirakozov.sd.refactoring.servlet.AbstractProductServlet;
 
@@ -17,7 +18,6 @@ import java.util.function.Supplier;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static ru.akirakozov.sd.refactoring.DbAccessor.*;
 
 public class AbstractServletTests<T extends AbstractProductServlet> {
     private final Supplier<T> supplier;
@@ -38,7 +38,7 @@ public class AbstractServletTests<T extends AbstractProductServlet> {
     @BeforeEach
     @AfterEach
     void clearDataBase() {
-        runSql(stmt -> stmt.executeUpdate(clearDatabaseQuery));
+        DbAccessor.clearDatabase();
     }
 
     protected void testServlet(@NotNull Map<String, String> requestParameters, @NotNull Consumer<String> responseChecker) throws IOException, ServletException {
