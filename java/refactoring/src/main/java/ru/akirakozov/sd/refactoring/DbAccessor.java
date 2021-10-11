@@ -28,7 +28,7 @@ public class DbAccessor {
             " PRICE          INT     NOT NULL)";
 
     @Contract(pure = true)
-    public static @NotNull String insert(String name, int price) {
+    public static @NotNull String insert(String name, long price) {
         return "INSERT INTO PRODUCT (NAME, PRICE) VALUES (\"" + name + "\", " + price + ")";
     }
 

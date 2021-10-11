@@ -3,7 +3,6 @@ import ru.akirakozov.sd.refactoring.servlet.GetProductsServlet;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 
 import static com.google.common.truth.Truth.assertThat;
