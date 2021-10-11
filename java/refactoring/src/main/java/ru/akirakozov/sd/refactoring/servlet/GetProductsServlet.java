@@ -1,7 +1,11 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
+import ru.akirakozov.sd.refactoring.HtmlRender;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 
 /**
  * @author akirakozov
@@ -10,7 +14,7 @@ public class GetProductsServlet extends AbstractProductServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        runQueryToHtml("SELECT * FROM PRODUCT", response, null, false, (rs, writer) -> {
+        runQueryToHtml("SELECT * FROM PRODUCT", response, null, NORMAL, (rs, writer) -> {
             while (rs.next()) {
                 writeProduct(rs, writer);
             }

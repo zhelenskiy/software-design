@@ -1,6 +1,7 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
+import ru.akirakozov.sd.refactoring.HtmlRender;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,15 +33,10 @@ public abstract class AbstractProductServlet extends HttpServlet {
         });
     }
 
-    public static void runQueryToHtml(String query, HttpServletResponse response, String header, boolean headerH1, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
-        runQuery(query, response, (set, writer) -> {
-            writer.println("<html><body>");
-            if (header != null) {
-                writer.println(headerH1 ? "<h1>" + header + "</h1>" : header);
-            }
-            resAndWriter.accept(set, writer);
-            writer.println("</body></html>");
-        });
+    public static void runQueryToHtml(String query, HttpServletResponse response, String header, HtmlRender.HeaderState headerState, ThrowableBiConsumer<ResultSet, PrintWriter> resAndWriter) {
+        runQuery(query, response,
+                (set, writer) -> HtmlRender.html(writer, header, headerState, () -> resAndWriter.accept(set, writer))
+        );
     }
 
     public static void runSql(ThrowableConsumer<Statement> statementUser) {

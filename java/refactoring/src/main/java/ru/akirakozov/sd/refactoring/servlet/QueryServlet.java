@@ -1,10 +1,14 @@
 package ru.akirakozov.sd.refactoring.servlet;
 
 import org.jetbrains.annotations.NotNull;
+import ru.akirakozov.sd.refactoring.HtmlRender;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.H1;
+import static ru.akirakozov.sd.refactoring.HtmlRender.HeaderState.NORMAL;
 
 /**
  * @author akirakozov
@@ -31,7 +35,7 @@ public class QueryServlet extends AbstractProductServlet {
 
     private void countTo(HttpServletResponse response) {
         runQueryToHtml("SELECT COUNT(*) FROM PRODUCT", response,
-                "Number of products: ", false, (rs, writer) -> {
+                "Number of products: ", NORMAL, (rs, writer) -> {
             if (rs.next()) {
                 writer.println(rs.getInt(1));
             }
@@ -40,7 +44,7 @@ public class QueryServlet extends AbstractProductServlet {
 
     private void sumTo(HttpServletResponse response) {
         runQueryToHtml("SELECT SUM(price) FROM PRODUCT", response,
-                "Summary price: ", false, (rs, writer) -> {
+                "Summary price: ", NORMAL, (rs, writer) -> {
                     if (rs.next()) {
                         writer.println(rs.getInt(1));
                     }
@@ -49,7 +53,7 @@ public class QueryServlet extends AbstractProductServlet {
 
     private void minTo(HttpServletResponse response) {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE LIMIT 1", response,
-                "Product with min price: ", true, (rs, writer) -> {
+                "Product with min price: ", H1, (rs, writer) -> {
                     if (rs.next()) {
                         writeProduct(rs, writer);
                     }
@@ -58,7 +62,7 @@ public class QueryServlet extends AbstractProductServlet {
 
     private void maxTo(HttpServletResponse response) {
         runQueryToHtml("SELECT * FROM PRODUCT ORDER BY PRICE DESC LIMIT 1", response,
-                "Product with max price: ", true, (rs, writer) -> {
+                "Product with max price: ", H1, (rs, writer) -> {
                     if (rs.next()) {
                         writeProduct(rs, writer);
                     }
